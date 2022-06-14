@@ -527,16 +527,16 @@ JL_DLLEXPORT int jl_getch(void) JL_NOTSAFEPOINT
     // On all other platforms, we do the POSIX terminal manipulation dance
     char c;
     int r;
-    struct termios old = {0};
-    struct termios new;
-    if (tcgetattr(0, &old) != 0)
+    struct termios old_termios = {0};
+    struct termios new_termios = {0};
+    if (tcgetattr(0, &old_termios) != 0)
         return -1;
-    new = old;
-    cfmakeraw(&new);
-    if (tcsetattr(0, TCSADRAIN, &new) != 0)
+    new_termios = old_termios;
+    cfmakeraw(&new_termios);
+    if (tcsetattr(0, TCSADRAIN, &new_termios) != 0)
         return -1;
     r = read(0, &c, 1);
-    if (tcsetattr(0, TCSADRAIN, &old) != 0)
+    if (tcsetattr(0, TCSADRAIN, &old_termios) != 0)
         return -1;
     return r == 1 ? c : -1;
 #endif
