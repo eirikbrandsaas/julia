@@ -525,24 +525,20 @@ JL_DLLEXPORT int jl_getch(void) JL_NOTSAFEPOINT
     return _getch();
 #else
     // On all other platforms, we do the POSIX terminal manipulation dance
-    char buf = 0;
+    char c;
+    int r;
     struct termios old = {0};
-    fflush(stdout);
-    if(tcgetattr(0, &old) < 0)
-        jl_error("tcgetattr()");
-    old.c_lflag &= ~ICANON;
-    old.c_lflag &= ~ECHO;
-    old.c_cc[VMIN] = 1;
-    old.c_cc[VTIME] = 0;
-    if(tcsetattr(0, TCSANOW, &old) < 0)
-        jl_error("tcsetattr(TCSANOW)");
-    if(read(0, &buf, 1) < 0)
-        jl_error("read()");
-    old.c_lflag |= ICANON;
-    old.c_lflag |= ECHO;
-    if(tcsetattr(0, TCSADRAIN, &old) < 0)
-        jl_error("tcsetattr(TCSADRAIN)");
-    return buf;
+    struct termios new;
+    if (tcgetattr(0, &old) != 0)
+        return -1;
+    new = old;
+    cfmakeraw(&new);
+    if (tcsetattr(0, TCSADRAIN, &new) != 0)
+        return -1;
+    r = read(0, &c, 1);
+    if (tcsetattr(0, TCSADRAIN, &old) != 0)
+        return -1;
+    return r == 1 ? c : -1;
 #endif
 }
 
