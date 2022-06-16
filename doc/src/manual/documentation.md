@@ -55,7 +55,7 @@ Compute the Bar index between `x` and `y`.
 If `y` is unspecified, compute the Bar index between all pairs of columns of `x`.
 
 # Examples
-```julia
+```julia-repl
 julia> bar([1, 2], [1, 2])
 1
 ```
@@ -174,7 +174,7 @@ As in the example above, we recommend following some simple conventions when wri
    ```
    ````
 
-   Examples that are untestable should be written within fenced code blocks starting with ````` ```julia`````
+   Examples that are untestable should be written within fenced code blocks starting with ````` ```julia-repl`````
    so that they are highlighted correctly in the generated documentation.
 
    !!! tip
